@@ -36,7 +36,7 @@ exports.post = async (req, res) => {
         return;
     }
 
-    if (await repository.exists(req.body.description)) {
+    if (await repository.exists(req.body.name)) {
         res.status(200).send({
             sucess: false,
             message: 'A categoria informada já está cadastrada.'
@@ -45,9 +45,7 @@ exports.post = async (req, res) => {
     }
 
     try {
-        await repository.create({
-            description: req.body.description
-        })
+        await repository.create(req.body)
         res.status(201).send({
             sucess: true,
             message: 'Categoria cadastrada com sucesso.'
@@ -101,6 +99,6 @@ exports.delete = async (req, res) => {
 };
 
 function validate(category, contract) {
-    contract.hasMinLen(category.description, 3, 'A descrição deve ter pelo menos 3 caracteres');
+    contract.hasMinLen(category.name, 3, 'O nome da categoria deve ter pelo menos 3 caracteres');
     return contract.isValid();
 }

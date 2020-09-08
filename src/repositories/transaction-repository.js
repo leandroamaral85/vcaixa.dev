@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Transaction = mongoose.model('Transaction');
+const Moment = require('moment');
 
 exports.get = async () => {
     return await Transaction.find();
@@ -9,41 +10,30 @@ exports.getById = async (id) => {
     return await Transaction.findById(id);
 };
 
-exports.getDailySummary = async (date, seller) => {
+exports.getDailySummary = async (seller) => {
+    let balance = 0;
     let data = await Transaction.find({
         date: {
-            $gte: new Date(date.getFullYear(), date.getMonth(), date.getDay())
+            $gte: new Moment().format('YYYY-MM-DD'),
+            $lte: new Moment().format('YYYY-MM-DD')
         },
         seller: seller
     }).populate('category');
 
-    let total = await Transaction.aggregate(
-        [
-            {
-                $group:
-                {
-                    _id: "$type",
-                    totalAmount: { $sum: "$value" }
-                }
+    if (data.length > 0) {
+        balance = data.reduce((sum, reg) => {
+            if (reg.type === 'ENTRADA') {
+                return sum + reg.value;
+            } else {
+                return sum - reg.value;
             }
-        ]
-    );
-
-    let balance = total.reduce((sum, reg) => {
-        if (reg._id === 'ENTRADA') {
-            return sum + reg.totalAmount;
-        } else {
-            return sum - reg.totalAmount;
-        }
-    }, 0);
+        }, 0);
+    } 
 
     return {
         totalBalance: balance,
-        transactions: [
-            data
-        ]
-    }
-
+        transactions:  data
+    }    
 };
 
 exports.create = async (data) => {

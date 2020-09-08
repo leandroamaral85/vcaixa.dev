@@ -1,7 +1,7 @@
 const validator = require('../validators/validator');
 const repository = require('../repositories/transaction-repository');
-const categoryRepository = require('../repositories/category-repository');
-const sellerRepository = require('../repositories/seller-repository');
+const authService = require('../services/auth-service');
+const userRepository = require('../repositories/user-repository');
 
 exports.get = async (req, res, next) => {
     try {
@@ -28,6 +28,10 @@ exports.getById = async (req, res, next) => {
 };
 
 exports.post = async (req, res, next) => {
+    let tokenData = await authService.getTokenData(req.header('x-access-token'));
+    let user = await userRepository.getById(tokenData.id);
+    req.body.seller = user.seller;
+
     let contract = new validator();
     if (!validate(req.body, contract)) {
         res.status(400).send({

@@ -9,10 +9,10 @@ exports.getById = async (id) => {
     return await Category.findById(id);
 };
 
-exports.exists = async (description) => {
+exports.exists = async (name) => {
     const res = await Category.find({
-        description: description
-    }, 'description');
+        name: name
+    });
     return res.length > 0;
 };
 
@@ -25,7 +25,7 @@ exports.update = async (id, data) => {
     await Category
         .findByIdAndUpdate(id, {
             $set: {
-                description: data.description
+                name: data.name
             }
         });
 };
