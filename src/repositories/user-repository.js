@@ -31,7 +31,7 @@ exports.update = async (id, data) => {
 };
 
 exports.delete = async (id) => {
-    await User.findOneAndRemove(id);
+    await User.findByIdAndDelete(id);
 };
 
 exports.authenticate = async (data) => {

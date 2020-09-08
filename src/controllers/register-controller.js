@@ -62,7 +62,6 @@ exports.post = async (req, res, next) => {
 			message: 'Empresa cadastrada com sucesso.'
 		});
 	} catch (e) {
-		console.log(e.message);
 		res.status(200).send({
 			sucess: false,
 			message: 'Falha ao cadastrar empresa: ' + e.message

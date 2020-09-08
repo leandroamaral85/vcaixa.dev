@@ -18,7 +18,7 @@ exports.exists = async (name) => {
 
 exports.create = async (data) => {
     var category = new Category(data);
-    await category.save();
+    return await category.save();
 };
 
 exports.update = async (id, data) => {
@@ -28,8 +28,9 @@ exports.update = async (id, data) => {
                 name: data.name
             }
         });
+    return this.getById(id);    
 };
 
 exports.delete = async (id) => {
-    await Category.findOneAndRemove(id);
+    await Category.findByIdAndDelete(id);
 };

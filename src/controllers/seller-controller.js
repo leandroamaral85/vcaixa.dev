@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const ValidatorContract = require('../validators/validator');
 const repository = require('../repositories/seller-repository');
+const transactionRepository = require('../repositories/transaction-repository');
 
 exports.get = async (req, res, next) => {
     try {
@@ -52,7 +53,16 @@ exports.put = async (req, res, next) => {
 
 exports.delete = async (req, res, next) => {
     try {
-        await repository.delete(req.body.id)
+        let hasTransactions = await transactionRepository.sellerHasTransactions(req.params.id);
+        if (hasTransactions) {
+            res.status(400).send({
+                sucess: false,
+                message: 'Esta empresa não pode ser excluída pois existem movimentações associadas a mesma.'
+            }).end();
+            return; 
+        }
+
+        await repository.delete(req.params.id)
         res.status(200).send({
             sucess: true,
             message: 'Empresa excluida com sucesso.'

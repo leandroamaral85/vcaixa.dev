@@ -10,7 +10,7 @@ exports.get = async (req, res, next) => {
     } catch (e) {
         res.status(400).send({
             sucess: false,
-            message: 'Erro ao buscar transações: ' + e.message
+            message: 'Erro ao buscar movimentações: ' + e.message
         });
     }
 };
@@ -22,7 +22,7 @@ exports.getById = async (req, res, next) => {
     } catch (e) {
         res.status(400).send({
             sucess: false,
-            message: 'Erro ao buscar transações: ' + e.message
+            message: 'Erro ao buscar movimentações: ' + e.message
         });
     }
 };
@@ -42,54 +42,82 @@ exports.post = async (req, res, next) => {
     }
 
     try {
-        await repository.create(req.body);
+        let transaction = await repository.create(req.body);
         res.status(201).send({
             sucess: true,
-            message: 'Transação cadastrada com sucesso.'
+            message: 'Movimentação cadastrada com sucesso.',
+            data: transaction
         });
     } catch (e) {
         res.status(400).send({
             sucess: false,
-            message: 'Falha ao cadastrar transação: ' + e.message
+            message: 'Falha ao cadastrar movimentação: ' + e.message
         });
     }
 };
 
 exports.put = async (req, res, next) => {
     try {
+        let tokenData = await authService.getTokenData(req.header('x-access-token'));
+        let user = await userRepository.getById(tokenData.id);
+        req.body.seller = user.seller;
+
         let contract = new validator();
         if (!validate(req.body, contract)) {
             res.status(400).send({
                 sucess: false,
-                errors: contract.errors()
+                message: contract.errors()
             }).end();
             return;
         }
 
-        await repository.update(req.params.id, req.body);
+        let oldTransaction = await repository.getById(req.params.id);
+        if (!oldTransaction.seller === user.seller) {
+            res.status(400).send({
+                sucess: false,
+                message: 'Esta movimentação pertence a outra empresa.'
+            }).end();
+            return;            
+        }
+
+        let transaction = await repository.update(req.params.id, req.body);
         res.status(201).send({
             sucess: true,
-            message: 'Transação atualizada com sucesso.'
+            message: 'Movimentação atualizada com sucesso.',
+            data: transaction
         });
     } catch (e) {
         res.status(400).send({
             sucess: false,
-            message: 'Falha ao atualizar os dados do transação: ' + e.message
+            message: 'Falha ao atualizar os dados da movimentação: ' + e.message
         });
     }
 };
 
 exports.delete = async (req, res, next) => {
     try {
-        await repository.delete(req.body.id)
+        let tokenData = await authService.getTokenData(req.header('x-access-token'));
+        let user = await userRepository.getById(tokenData.id);
+        req.body.seller = user.seller;
+                
+        let oldTransaction = await repository.getById(req.params.id);
+        if (!oldTransaction.seller === user.seller) {
+            res.status(400).send({
+                sucess: false,
+                message: 'Esta movimentação pertence a outra empresa.'
+            }).end();
+            return;            
+        }
+
+        await repository.delete(req.params.id)
         res.status(200).send({
             sucess: true,
-            message: 'Transação excluída com sucesso.'
+            message: 'Movimentação excluída com sucesso.'
         });
     } catch (e) {
         res.status(400).send({
             sucess: false,
-            message: 'Falha ao excluir transação: ' + e.message
+            message: 'Falha ao excluir movimentação: ' + e.message
         });
     }
 };

@@ -1,5 +1,6 @@
 const validator = require('../validators/validator');
 const repository = require('../repositories/category-repository');
+const transactionRepository = require('../repositories/transaction-repository');
 
 exports.get = async (req, res) => {
     try {
@@ -31,7 +32,7 @@ exports.post = async (req, res) => {
     if (!validate(req.body, contract)) {
         res.status(400).send({
             sucess: false,
-            errors: contract.errors()
+            message: contract.errors()
         }).end();
         return;
     }
@@ -45,10 +46,11 @@ exports.post = async (req, res) => {
     }
 
     try {
-        await repository.create(req.body)
+        let category = await repository.create(req.body)
         res.status(201).send({
             sucess: true,
-            message: 'Categoria cadastrada com sucesso.'
+            message: 'Categoria cadastrada com sucesso.',
+            data: category
         });
     } catch (e) {
         res.status(400).send({
@@ -65,15 +67,16 @@ exports.put = async (req, res) => {
         if (!validate(req.body, contract)) {
             res.status(400).send({
                 sucess: false,
-                errors: contract.errors()
+                message: contract.errors()
             }).end();
             return;
         }
 
-        await repository.update(req.params.id, req.body);
+        let category = await repository.update(req.params.id, req.body);
         res.status(201).send({
             sucess: true,
-            message: 'Categoria atualizada com sucesso.'
+            message: 'Categoria atualizada com sucesso.',
+            data: category
         });
     } catch (e) {
         res.status(400).send({
@@ -85,7 +88,16 @@ exports.put = async (req, res) => {
 
 exports.delete = async (req, res) => {
     try {
-        await repository.delete(req.body.id)
+        let hasTransactions = await transactionRepository.categoryHasTransactions(req.params.id);
+        if (hasTransactions) {
+            res.status(400).send({
+                sucess: false,
+                message: 'Esta categoria não pode ser excluída pois existem movimentações associadas a mesma.'
+            }).end();
+            return; 
+        } 
+
+        await repository.delete(req.params.id)
         res.status(200).send({
             sucess: true,
             message: 'Categoria excluída com sucesso.'

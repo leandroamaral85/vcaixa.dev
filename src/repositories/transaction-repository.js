@@ -47,5 +47,21 @@ exports.update = async (id, data) => {
 };
 
 exports.delete = async (id) => {
-    await Transaction.findOneAndRemove(id);
+    await Transaction.findByIdAndDelete(id);
 };
+
+exports.categoryHasTransactions = async (category) => { 
+    let data = await Transaction.findOne({
+        category: category
+    });
+
+    return (data !== null);
+}
+
+exports.sellerHasTransactions = async (seller) => { 
+    let data = await Transaction.findOne({
+        seller: seller
+    });
+    
+    return (data !== null);
+}

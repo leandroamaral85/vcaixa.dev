@@ -37,5 +37,5 @@ exports.update = async (id, data) => {
 };
 
 exports.delete = async (id) => {
-    await Seller.findOneAndRemove(id);
+    await Seller.findByIdAndDelete(id);
 };
