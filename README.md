@@ -18,7 +18,7 @@ npm run start
 Para acessar os endpoints da API é necessário fazer o login. Para fins de testes, foi disponibilizado um usuário pré-cadastrado. Para efetuar o login, basta enviar uma requisição do tipo POST para o endpoint /v1/login com e-mail e senha, conforme abaixo:
 ```json
 {
-    "email": "teste@teste.com"
+    "email": "teste@teste.com",
     "password": "12345678"
 }
 ```
