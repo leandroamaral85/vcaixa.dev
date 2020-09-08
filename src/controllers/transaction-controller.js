@@ -28,9 +28,7 @@ exports.getById = async (req, res, next) => {
 };
 
 exports.post = async (req, res, next) => {
-    let tokenData = await authService.getTokenData(req.header('x-access-token'));
-    let user = await userRepository.getById(tokenData.id);
-    req.body.seller = user.seller;
+    await getSeller(req);
 
     let contract = new validator();
     if (!validate(req.body, contract)) {
@@ -58,9 +56,7 @@ exports.post = async (req, res, next) => {
 
 exports.put = async (req, res, next) => {
     try {
-        let tokenData = await authService.getTokenData(req.header('x-access-token'));
-        let user = await userRepository.getById(tokenData.id);
-        req.body.seller = user.seller;
+        await getSeller(req);
 
         let contract = new validator();
         if (!validate(req.body, contract)) {
@@ -72,7 +68,7 @@ exports.put = async (req, res, next) => {
         }
 
         let oldTransaction = await repository.getById(req.params.id);
-        if (!oldTransaction.seller === user.seller) {
+        if (!oldTransaction.seller === req.body.seller) {
             res.status(400).send({
                 sucess: false,
                 message: 'Esta movimentação pertence a outra empresa.'
@@ -96,12 +92,10 @@ exports.put = async (req, res, next) => {
 
 exports.delete = async (req, res, next) => {
     try {
-        let tokenData = await authService.getTokenData(req.header('x-access-token'));
-        let user = await userRepository.getById(tokenData.id);
-        req.body.seller = user.seller;
+        await getSeller(req);
                 
         let oldTransaction = await repository.getById(req.params.id);
-        if (!oldTransaction.seller === user.seller) {
+        if (!oldTransaction.seller === req.body.seller) {
             res.status(400).send({
                 sucess: false,
                 message: 'Esta movimentação pertence a outra empresa.'
@@ -121,6 +115,12 @@ exports.delete = async (req, res, next) => {
         });
     }
 };
+
+async function getSeller(req) {
+    let tokenData = await authService.getTokenData(req.header('x-access-token'));
+    let user = await userRepository.getById(tokenData.id);
+    req.body.seller = user.seller;
+}
 
 function validate(transaction, contract) {
     contract.isRequired(transaction.category, 'A categoria é de preenchimento obrigatório.');

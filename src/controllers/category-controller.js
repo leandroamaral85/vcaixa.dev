@@ -28,7 +28,6 @@ exports.getById = async (req, res) => {
 
 exports.post = async (req, res) => {
     let contract = new validator();
-
     if (!validate(req.body, contract)) {
         res.status(400).send({
             sucess: false,
@@ -63,7 +62,6 @@ exports.post = async (req, res) => {
 exports.put = async (req, res) => {
     try {
         let contract = new validator();
-
         if (!validate(req.body, contract)) {
             res.status(400).send({
                 sucess: false,

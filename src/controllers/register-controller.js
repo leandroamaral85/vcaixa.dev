@@ -7,7 +7,6 @@ const md5 = require('md5');
 exports.post = async (req, res, next) => {
 	try {
 		let contract = new validator();
-
 		if (!validateCompany(req.body.company, contract)) {
 			res.status(200).send({
 				sucess: false,
