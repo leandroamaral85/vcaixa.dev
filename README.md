@@ -16,14 +16,15 @@ npm run start
 
 ### Login
 Para acessar os endpoints da API é necessário fazer o login. Para fins de testes, foi disponibilizado um usuário pré-cadastrado. Para efetuar o login, basta enviar uma requisição do tipo POST para o endpoint /v1/login com e-mail e senha, conforme abaixo:
-
+```json
 {
-    "email": "teste@teste.com"
+    "email": "teste@teste.com",
     "password": "12345678"
 }
+```
 
 Ao fazer o login, serão devolvidos na resposta os dados do usuário, a empresa a qual o mesmo está vinculado e um token que deverá ser utilizado para acessar os demais endpoints. Este token tem a duração de 1 hora e sempre deverá ser enviado no cabeçalho de nome "x-access-token" de cada requisição:
-
+```json
 {
     "sucess": true,
     "username": "teste@teste.com",
@@ -37,17 +38,19 @@ Ao fazer o login, serão devolvidos na resposta os dados do usuário, a empresa 
         "__v": 0
     }
 }
+```
 
 ### Cadastro de categorias
 Para cadastrar categorias, basta enviar uma requisição do tipo POST para o endpoint /v1/categories, conforme abaixo. Estão disponíveis algumas categorias pré-cadastradas que podem ser obtidas através do método GET:
-
+```json
 {
     "name": "Folha de Pagamento"
 }
+```
 
 ### Cadastro de movimentações
 Para cadastrar movimentações, basta enviar uma requisição do tipo POST para o endpoint /v1/transactions, conforme abaixo:
-
+```json
 {
     "date": "2020-09-07",
     "type": "SAIDA",
@@ -55,6 +58,7 @@ Para cadastrar movimentações, basta enviar uma requisição do tipo POST para 
     "description": "Material para limpeza da loja",
     "category": "5f56bcacd3bc9625b0bd2407"
 }
+```
 
 O campo "type" deve conter obrigatoriamente a string "ENTRADA" ou "SAIDA" dependendo do tipo da movimentação. O campo "category" deve conter o ID da categoria.
 
@@ -63,7 +67,7 @@ Para obter o resumo diário das movimentações, basta enviar uma requisição d
 
 ### Outras features
 Pode ser cadastrada uma nova empresa através do endpoint /v1/register utilizando o método POST. Neste cadastro, deve ser informado o nome da empresa, o CNPJ e os dados para a criação de um novo usuário como: e-mail, nome e senha:
-
+```json
 {
     "company": {
         "companyName": "Nova empresa",
@@ -75,3 +79,4 @@ Pode ser cadastrada uma nova empresa através do endpoint /v1/register utilizand
         "password": "12345678"
     }
 }
+```
