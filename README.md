@@ -42,10 +42,11 @@ Ao fazer o login, serão devolvidos na resposta os dados do usuário, a empresa 
 
 ### Cadastro de categorias
 Para cadastrar categorias, basta enviar uma requisição do tipo POST para o endpoint /v1/categories, conforme abaixo. Estão disponíveis algumas categorias pré-cadastradas que podem ser obtidas através do método GET:
-
+```json
 {
     "name": "Folha de Pagamento"
 }
+```
 
 ### Cadastro de movimentações
 Para cadastrar movimentações, basta enviar uma requisição do tipo POST para o endpoint /v1/transactions, conforme abaixo:
